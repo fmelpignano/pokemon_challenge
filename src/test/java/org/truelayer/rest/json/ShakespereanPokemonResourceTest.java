@@ -7,16 +7,32 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 
+import javax.ws.rs.core.MediaType;
+
 @QuarkusTest
 public class ShakespereanPokemonResourceTest {
 
     @Test
     public void testHelloEndpoint() {
         given()
-          .when().get("/resteasy/hello")
+          .when().get("/pokemon")
           .then()
              .statusCode(200)
              .body(is("hello"));
+    }
+    
+    @Test
+    public void testPokemonEndpoint() {
+    	String aPokemonName = "charizard";
+    	String aExpectedReply = "{ \"name\": \"" + aPokemonName +"\", \"description\": \"" + aPokemonName + "\"  }";
+        given()
+          .pathParam("name", aPokemonName)
+          .when().get("/pokemon/{name}")
+          .then()
+             .statusCode(200)
+             .body(is(aExpectedReply))
+             .and()
+             .contentType(MediaType.APPLICATION_JSON);
     }
     
     @Test
