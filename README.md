@@ -1,4 +1,4 @@
-# truelayer_pokemon project
+# pokemon_challenget  project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
