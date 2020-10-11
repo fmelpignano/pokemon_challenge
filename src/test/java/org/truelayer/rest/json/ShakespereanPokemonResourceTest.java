@@ -1,6 +1,7 @@
 package org.truelayer.rest.json;
 
 import io.quarkus.test.junit.QuarkusTest;
+
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
@@ -11,23 +12,15 @@ import javax.ws.rs.core.MediaType;
 
 @QuarkusTest
 public class ShakespereanPokemonResourceTest {
-
-    @Test
-    public void testHelloEndpoint() {
-        given()
-          .when().get("/pokemon")
-          .then()
-             .statusCode(200)
-             .body(is("hello"));
-    }
     
     @Test
-    public void testPokemonEndpoint() {
+    public void testPokemonSuccess() {
     	String aPokemonName = "charizard";
-    	String aExpectedReply = "{ \"name\": \"" + aPokemonName +"\", \"description\": \"" + aPokemonName + "\"  }";
+    	String aExpectedSpecies = "https://pokeapi.co/api/v2/pokemon-species/6/";
+    	String aExpectedReply = "{ \"name\": \"" + aPokemonName +"\", \"description\": \"" + aExpectedSpecies + "\"  }";
         given()
           .pathParam("name", aPokemonName)
-          .when().get("/pokemon/{name}")
+          .when().get("pokemon/{name}")
           .then()
              .statusCode(200)
              .body(is(aExpectedReply))
@@ -36,8 +29,23 @@ public class ShakespereanPokemonResourceTest {
     }
     
     @Test
-    public void testFailureHelloEndpoint() {
-    	String aPath = "http://127.0.0.1:8081/resteasy/hello1";
+    public void testPokemonNotFound() {
+    	String aPokemonName = "not_found";
+    	String aExpectedSpecies = "Not Found";
+    	String aExpectedReply = "{ \"name\": \"" + aPokemonName +"\", \"description\": \"" + aExpectedSpecies + "\"  }";
+        given()
+          .pathParam("name", aPokemonName)
+          .when().get("pokemon/{name}")
+          .then()
+             .statusCode(200)
+             .body(is(aExpectedReply))
+             .and()
+             .contentType(MediaType.APPLICATION_JSON);
+    }
+    
+    @Test
+    public void testPokemonFailure() {
+    	String aPath = "http://127.0.0.1:8081/resteasy/wrong";
     	String aExpectedMessage = "RESTEASY003210: Could not find resource for full path: " + aPath;
         given()
           .when().get(aPath)
