@@ -16,8 +16,6 @@ import org.truelayer.rest.json.pokeclient.PokeApiService;
 import org.truelayer.rest.json.pokeclient.Pokemon;
 import org.truelayer.rest.json.pokeclient.Species;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Alternative()
@@ -31,8 +29,8 @@ public class MockPokeApiService implements PokeApiService {
 	/*
 	 * Map used to emulate service replies.
 	 */
-	private final static String POKEMON_SUCCESS = "file/charizard.json";
-	private final static String POKEMON_SPECIES_SUCCESS = "file/charizard_species.json";
+	private final static String POKEMON_SUCCESS = "file/charizard_pokeapi_pokemon_reply.json";
+	private final static String POKEMON_SPECIES_SUCCESS = "file/charizard_pokeapi_species_reply.json";
 	private final static String NOT_FOUND= "file/not_found.json";
 	
 	/*

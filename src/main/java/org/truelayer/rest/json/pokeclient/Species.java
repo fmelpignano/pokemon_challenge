@@ -75,6 +75,8 @@ public class Species {
 				.map( x -> { return x.flavor_text; })
 				.max(Comparator.comparingInt(String::length))
 				.orElse("");
+		// It seems as Shakespeare Translation service do not like these characters.
+	    aResult = aResult.replaceAll("\\n|\\f|\\t|\\r", " ");
 		return aResult;
 	}
 }

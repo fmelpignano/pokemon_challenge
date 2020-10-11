@@ -21,7 +21,7 @@ public class ShakespereanPokemonResourceTest {
     
 	private static final Logger LOGGER = Logger.getLogger(ShakespereanPokemonResourceTest.class);
 	
-	private final static String REPLY_SUCCESS = "file/charizard_reply.json";
+	private final static String REPLY_SUCCESS = "file/charizard_truelayerservice_reply.json";
 	private final static String REPLY_NOT_FOUND= "file/not_found_reply.json";
 	
     @Test
@@ -52,11 +52,19 @@ public class ShakespereanPokemonResourceTest {
     public void testPokemonFailure() {
     	String aPath = "http://127.0.0.1:8081/resteasy/wrong";
     	String aExpectedMessage = "RESTEASY003210: Could not find resource for full path: " + aPath;
-        given()
+        
+    	given()
           .when().get(aPath)
           .then()
              .statusCode(404)
              .body(containsString(aExpectedMessage));
+        
+    	// Updating path to an existing endpoint
+    	aPath = "http://127.0.0.1:8180/resteasy/wrong";
+        given()
+          .when().get(aPath)
+          .then()
+             .statusCode(404);
     }
     
     
