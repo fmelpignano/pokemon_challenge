@@ -1,5 +1,9 @@
 package org.truelayer.rest.json.pokeclient;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.PatternSyntaxException;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -43,6 +47,27 @@ public class Pokemon {
 			this.name = name;
 			this.url = speciesUrl;
 		}
+	}
+	
+	/**
+	 * Gather the information about Species Id corresponding to Pokemon Species from the url field.
+	 * If not found, return empry string. 
+	 * @return Species Id taken from Species url if existing, empty string otherwise
+	 */
+	public String getSpeciesId() {
+		String aId = "";
+		
+		if (this.species != null && this.species.url != null) {
+			List<String> aTokens = Arrays.asList(this.species.url.split("/"));
+	    	Integer aIndex = null;
+	    	
+	    	if (aTokens != null && !aTokens.isEmpty()) {
+	    		aIndex = aTokens.size() - 1;
+	    	}
+	    	aId = aTokens.get(aIndex);
+		}
+		
+		return aId;
 	}
 	
 	/* For Testing Purpose */

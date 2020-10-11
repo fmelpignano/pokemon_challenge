@@ -1,5 +1,6 @@
 package org.truelayer.rest.json.pokeclient;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -57,5 +58,23 @@ public class Species {
 		public Version() {
 			
 		}
+	}
+	
+	/**
+	 * 1. Get a stream of flavor_text_entries
+	 * 2. Remove the ones not matching the language in input (or English - "en") by default
+	 * 3. Get the flavor text value
+	 * 4. Get the longest String among the flavor texts.
+	 * @param language The language to filter on, English ("en") by default.
+	 * @return The longest string among the flavor text entries matching language parameter (or empty string if not found).
+	 */
+	public String getLongestFlavorTextEntryByLanguage(String language) {
+		String aResult = this.flavor_text_entries
+				.stream()
+				.filter(x -> { return x.language.name.equals(language); })
+				.map( x -> { return x.flavor_text; })
+				.max(Comparator.comparingInt(String::length))
+				.orElse("");
+		return aResult;
 	}
 }

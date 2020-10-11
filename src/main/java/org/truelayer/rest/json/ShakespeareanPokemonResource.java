@@ -10,6 +10,7 @@ import javax.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.truelayer.rest.json.pokeclient.Species;
 import org.truelayer.rest.json.pokeclient.PokeApiService;
 import org.truelayer.rest.json.pokeclient.Pokemon;
 
@@ -21,7 +22,7 @@ import org.truelayer.rest.json.pokeclient.Pokemon;
 * 
 * The processing when received a getDescriptionByName request is as following:
 * - Call PokeApi client to retrieve information about Pokemon Species Id
-* - Call PokeApi clien to retrieve information about Pokemon Species containing its description
+* - Call PokeApi client to retrieve information about Pokemon Species containing its description
 * - Call Shakespeare translator client, pass the description to it and get the translation
 * - Send back the reply to che client
 *
@@ -44,13 +45,33 @@ public class ShakespeareanPokemonResource {
     @GET
     @Path("/{name}")
     public Response getDescriptionByName(@PathParam String name) {
-    	// Call Poke Api to get Pokemon by Name
-    	Pokemon aPokemon = pokeApiServiceClient.getPokemonByName(name);
     	
-    	// Call Shakespeare Translator
-    	
-    	// Send back a reply
-    	String aReply = "{ \"name\": \"" + aPokemon.name +"\", \"description\": \"" + aPokemon.species.url + "\"  }";
-    	return Response.ok(aReply).build();
+    	try {
+	    	// Call Poke Api to get Pokemon by Pokemon Name    	
+	    	LOGGER.info("Looking for Pokemon: " +  name);
+	    	Pokemon aPokemon = pokeApiServiceClient.getPokemonByName(name);
+	    	LOGGER.info("Pokemon species is: " + aPokemon.species.name + ", checking url: " + aPokemon.species.url );
+	    	
+	    	// Parsing the species url to get the species id
+	    	String aSpeciesId = aPokemon.getSpeciesId();
+	    	
+	    	// Call Poke Api to get Species by Species Id
+	    	LOGGER.debug("Looking for Species with Id: " +  aSpeciesId);
+	    	Species aSpecies = pokeApiServiceClient.getSpeciesById(aSpeciesId);
+	    	LOGGER.info("Pokemon species received name is: " + aSpecies.name);
+	    	
+	    	// Parse the flavor_text_entries in Species to find longest English description.
+	    	final String aDescriptionLanguge = "en";
+	    	String aDescription = aSpecies.getLongestFlavorTextEntryByLanguage(aDescriptionLanguge);
+	    	LOGGER.info("flavor_text is: " + aDescription);
+	    	
+	    	// Send back a reply
+	    	ShakespeareanPokemon aShakespeareanPokemon = new ShakespeareanPokemon(name, aDescription);
+	    	return Response.ok(aShakespeareanPokemon).build();
+	    	
+    	} catch(Exception e) {
+    		// If there is any exception send out a corresponding response with empty ShakespeareanPokemon.
+    		return Response.status(500, e.getMessage()).entity(new ShakespeareanPokemon()).build();
+    	}
     }
 }
