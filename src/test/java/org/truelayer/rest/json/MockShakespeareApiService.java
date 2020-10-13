@@ -17,6 +17,7 @@ import org.truelayer.rest.json.shakespeareclient.ShakespeareApiService;
 import org.truelayer.rest.json.shakespeareclient.ShakespeareTranslation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
 
 @Alternative()
 @Priority(1)

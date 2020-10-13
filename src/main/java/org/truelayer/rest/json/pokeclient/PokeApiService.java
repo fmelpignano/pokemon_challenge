@@ -1,7 +1,9 @@
 package org.truelayer.rest.json.pokeclient;
 
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.truelayer.rest.json.exception.CustomResponseExceptionMapper;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/api/v2/")
 @RegisterRestClient
+@RegisterProvider(CustomResponseExceptionMapper.class)
 @Produces(MediaType.APPLICATION_JSON)
 public interface PokeApiService {
 
