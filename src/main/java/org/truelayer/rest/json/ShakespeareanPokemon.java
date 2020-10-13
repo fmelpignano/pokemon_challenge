@@ -17,38 +17,26 @@ public class ShakespeareanPokemon {
 	
 	public String name;
 	public String description;
-	public Result status;
+	public Status status;
 	
-	private static ObjectMapper objectMapper = new ObjectMapper();
+	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	
 	/* Needed by Jackson */
 	public ShakespeareanPokemon() {
 		
 	}
 	
-	// 
-	public static class Result {
-		public Integer statusCode;
-		public String message;
-		
-		public Result() {
-			
-		}
-	}
-	
-	public ShakespeareanPokemon(String name, String description, Integer statusCode, String message) {
+	public ShakespeareanPokemon(String name, String description, Status status) {
 		this.name = name;
 		this.description = description;
-		this.status = new Result();
-		this.status.statusCode = statusCode;
-		this.status.message = message;
+		this.status = new Status();
+		this.status = status;
 	}
 	
 	public String toString() {
 		try {
-			return objectMapper.writeValueAsString(this);
+			return OBJECT_MAPPER.writeValueAsString(this);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return "";

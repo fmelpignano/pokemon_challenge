@@ -2,6 +2,9 @@ package org.truelayer.rest.json.pokeclient;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+
+import org.truelayer.rest.json.exception.UnableToGetPokemonDescription;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -66,17 +69,22 @@ public class Species {
 	 * 3. Get the flavor text value
 	 * 4. Get the longest String among the flavor texts.
 	 * @param language The language to filter on, English ("en") by default.
-	 * @return The longest string among the flavor text entries matching language parameter (or empty string if not found).
+	 * @return The longest string among the flavor text entries matching language parameter.
+	 * @throws UnableToGetPokemonDescription if no description can be found 
 	 */
-	public String getLongestFlavorTextEntryByLanguage(String language) {
-		String aResult = this.flavor_text_entries
+	public String getLongestFlavorTextEntryByLanguage(String language) throws Exception {
+		Optional<String> aOptionalResult = this.flavor_text_entries
 				.stream()
 				.filter(x -> { return x.language.name.equals(language); })
 				.map( x -> { return x.flavor_text; })
-				.max(Comparator.comparingInt(String::length))
-				.orElse("");
-		// It seems as Shakespeare Translation service do not like these characters.
-	    aResult = aResult.replaceAll("\\n|\\f|\\t|\\r", " ");
-		return aResult;
+				.max(Comparator.comparingInt(String::length));
+		
+		if (aOptionalResult.isPresent()) {
+			// It seems as Shakespeare Translation service do not like these characters.
+		    String aResult = aOptionalResult.get().replaceAll("\\n|\\f|\\t|\\r", " ");
+			return aResult;
+		} else {
+			throw new UnableToGetPokemonDescription();
+		}
 	}
 }
