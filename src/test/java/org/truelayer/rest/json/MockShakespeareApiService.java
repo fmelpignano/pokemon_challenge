@@ -11,18 +11,35 @@ import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 
+import org.eclipse.microprofile.faulttolerance.Timeout;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.logging.Logger;
+import org.truelayer.rest.json.exception.CustomResponseExceptionMapper;
 import org.truelayer.rest.json.shakespeareclient.ShakespeareApiService;
-import org.truelayer.rest.json.shakespeareclient.ShakespeareTranslation;
+import org.truelayer.rest.json.shakespeareclient.ShakespeareTranslationQuery;
+import org.truelayer.rest.json.shakespeareclient.ShakespeareTranslationReply;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
+
+/**
+* Mock implemenation of Shakespeare Translator client for unit testing. 
+* The translation map helps to create diffeent scenarii depending on the input text. 
+* To provide an index in the map an hash is computed starting from text to be translated in input,
+* to associated it with the right translation.  
+* 
+* @author  Fabio Melpignano
+* @version 1.0
+* @since   11-OCT-2020
+*/
+
 
 @Alternative()
 @Priority(1)
 @ApplicationScoped
+@RegisterProvider(CustomResponseExceptionMapper.class)
 @RestClient
+@Timeout(1000)
 public class MockShakespeareApiService implements ShakespeareApiService {
 	
 	private static final Logger LOGGER = Logger.getLogger(MockShakespeareApiService.class);
@@ -39,17 +56,17 @@ public class MockShakespeareApiService implements ShakespeareApiService {
 	 * translation service. 
 	 */
 	private final Map<Long, String> translations = Stream.of(new Object[][] {
-		  { 2228024628L, TRANSLATION_SUCCESS }, 
+		  { 2399199406L, TRANSLATION_SUCCESS }, 
 		  { 1L, NOT_FOUND }, 
 		}).collect(Collectors.toMap(data -> (Long) data[0], data -> (String) data[1]));
 	
 
 	@Override
-	public ShakespeareTranslation getShakespeareTranslation(String text) {
+	public ShakespeareTranslationReply getShakespeareTranslation(ShakespeareTranslationQuery text) {
 		// Compute checksum of incoming text and use it as index for the
 		// map of expected replies.
 		CRC32 aChecksum = new CRC32();
-		aChecksum.update(text.getBytes());
+		aChecksum.update(text.toString().getBytes());
 		Long aHash = aChecksum.getValue();
 		
 		LOGGER.infof("Mock getShakespeareTranslation called with %s parameter", text);
@@ -65,12 +82,12 @@ public class MockShakespeareApiService implements ShakespeareApiService {
 		try {
 			// Convert the json file to its Java class representation
 			ObjectMapper objectMapper = new ObjectMapper();
-			ShakespeareTranslation aTranslation = objectMapper.readValue(file, ShakespeareTranslation.class);
+			ShakespeareTranslationReply aTranslation = objectMapper.readValue(file, ShakespeareTranslationReply.class);
 			LOGGER.info(objectMapper.writeValueAsString(aTranslation));
 			return aTranslation;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return new ShakespeareTranslation();
+			return new ShakespeareTranslationReply();
 		}
 	}
 	
