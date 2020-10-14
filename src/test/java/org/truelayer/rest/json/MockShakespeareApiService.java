@@ -86,7 +86,6 @@ public class MockShakespeareApiService implements ShakespeareApiService {
 			LOGGER.info(objectMapper.writeValueAsString(aTranslation));
 			return aTranslation;
 		} catch (IOException e) {
-			e.printStackTrace();
 			return new ShakespeareTranslationReply();
 		}
 	}

@@ -82,8 +82,7 @@ public class MockPokeApiService implements PokeApiService {
 			try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				LOGGER.info("Thread interrupted");
 			}
 		}
 		
@@ -98,7 +97,6 @@ public class MockPokeApiService implements PokeApiService {
 			Pokemon aPokemon = objectMapper.readValue(file, Pokemon.class);
 			return aPokemon;
 		} catch (Exception e) {
-			e.printStackTrace();
 			// if there has been an issue parsing the file (i.e. in case of not_found case)
 			// then catch and throw a runtime exception to emulate real client behavior. 
 			LOGGER.info("Throwing runtime exception");
@@ -122,7 +120,6 @@ public class MockPokeApiService implements PokeApiService {
 			Species aSpecies = objectMapper.readValue(file, Species.class);
 			return aSpecies;
 		} catch (IOException e) {
-			e.printStackTrace();
 			// if there has been an issue parsing the file (i.e. in case of not_found case)
 			// then catch and throw a runtime exception to emulate real client behavior. 
 			LOGGER.info("Throwing runtime exception");
