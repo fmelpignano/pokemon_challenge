@@ -4,12 +4,24 @@ For information about how to run the service, please refer to "How to run it ?" 
 
 The following sections will also focus on high level flow and technical choices performed. 
 
+## Requirements
+The best way to see the project working is to use [Quarkus Environment repository](https://github.com/fmelpignano/QuarkusEnvironment).
+
+All the steps to ensure a smooth development experience have been automated in its provision.sh script. 
+
+If for any reason this would be of your preference, consider the following requirements:
+* OpenJDK 1.8
+* MVN 3.6.3
+* Docker CE 19.03.13 (if willing to build an image)
+
 ## Why Quarkus ? 
 
 Because it is a framework on which I would like to gather some knowledge for different reasons: 
 - optimized for the cloud environment
 - native mode (decrease start time and memory footprint)
 - plugin mechanism to "easily" enable features (fault tolerance, observability, etc.)
+- easy to generate docker images
+
 Last but not least it has been an opportunity to practice with a CDI framework. 
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
@@ -74,7 +86,10 @@ With all the abstraction put in place, plus the different flavor offered, is qui
 
 * Security
 
-No authentication or authorization put in place during this experience; plugins exist for such purpose but they have not been tested in this scope. 
+No authentication or authorization put in place during this experience; plugins exist for such purpose but they have not been tested in this scope.
+
+* Native image 
+Definitely someting worth testing 
 
 ## How to run it ?
 
@@ -83,6 +98,13 @@ No authentication or authorization put in place during this experience; plugins 
 You can run your application in dev mode that enables live coding using:
 ```shell script
 ./mvnw compile quarkus:dev
+```
+
+### Run the unit tests
+
+You can run your application in dev mode that enables live coding using:
+```shell script
+./mvnw test
 ```
 
 ### Packaging and running the application
@@ -102,6 +124,8 @@ The application is now runnable using `java -jar target/truelayer_pokemon-1.0.0-
 
 ### Creating a native executable
 
+This section has been left here for further testing in the future but native executable has not been tested for this project. 
+
 You can create a native executable using: 
 ```shell script
 ./mvnw package -Pnative
@@ -116,10 +140,43 @@ You can then execute your native executable with: `./target/truelayer_pokemon-1.
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
 
+### Creating a docker image
+
+A docker image can be created using the Dockerfile in ./src/main/docker folder (several available, depending on the options) by running:
+```shell script
+sudo ./mvnw package -Dquarkus.container-image.build=true
+```
+
+The image is based on registry.access.redhat.com/ubi8/ubi-minimal:8.1 image. 
+
+If everything is correct, the docker image will show up:
+```shell script
+sudo docker images
+REPOSITORY                                    TAG                 IMAGE ID            CREATED             SIZE
+root/truelayer_pokemon                        1.0.0-SNAPSHOT      c7df5d1938a6        2 minutes ago       512MB
+registry.access.redhat.com/ubi8/ubi-minimal   8.1                 91d23a64fdf2        6 months ago        107MB
+```
+
+### Run the application in a docker container
+
+To run the application in a Docker container:
+```shell script
+[vagrant@localhost docker]$ sudo docker run -i --rm -p 8080:8080 root/truelayer_pokemon:1.0.0-SNAPSHOT
+```
+
+The result should be similar to:
+```shell script 
+exec java -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -XX:+ExitOnOutOfMemoryError -cp . -jar /deployments/app.jar
+__  ____  __  _____   ___  __ ____  ______
+ --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+ -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
+--\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+09:41:33 INFO  [io.quarkus] (main) truelayer_pokemon 1.0.0-SNAPSHOT on JVM (powered by Quarkus 1.8.3.Final) started in 4.051s. Listening on: http://0.0.0.0:8080
+09:41:33 INFO  [io.quarkus] (main) Profile prod activated.
+09:41:33 INFO  [io.quarkus] (main) Installed features: [cdi, rest-client, resteasy, resteasy-jackson, smallrye-context-propagation, smallrye-fault-tolerance]
+```
+
 # Further Readings
 
-## RESTEasy JAX-RS
-Guide: https://quarkus.io/guides/rest-json
-
-## Quarkus Cookbook
-https://learning.oreilly.com/library/view/quarkus-cookbook/
+* RESTEasy JAX-RS Guide: https://quarkus.io/guides/rest-json
+* Quarkus Cookbook https://learning.oreilly.com/library/view/quarkus-cookbook/
