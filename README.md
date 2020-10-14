@@ -9,7 +9,7 @@ The best way to see the project working is to use [Quarkus Environment repositor
 
 All the steps to ensure a smooth development experience have been automated in its provision.sh script. 
 
-If for any reason this would be of your preference, consider the following requirements:
+If for any reason this would not be of your preference, consider the following requirements:
 * OpenJDK 1.8
 * MVN 3.6.3
 * Docker CE 19.03.13 (if willing to build an image)
@@ -17,8 +17,7 @@ If for any reason this would be of your preference, consider the following requi
 ## Why Quarkus ? 
 
 Because it is a framework on which I would like to gather some knowledge for different reasons: 
-- optimized for the cloud environment
-- native mode (decrease start time and memory footprint)
+- optimized for the cloud environment (decrease start time and memory footprint with native mode)
 - plugin mechanism to "easily" enable features (fault tolerance, observability, etc.)
 - easy to generate docker images
 
@@ -48,34 +47,39 @@ It contains everything related to the Poke API client: the REST client interface
 It contains everything related to the Shakespeare Translator client: the REST client interface and classes to map JSON quey/reply.
 
 To follow the service flow, I suggest to start from ShakespereanPokemonResource class; this class:
-* Call GET method on Poke API service to gather Pokemon information (specifically the species Id)
-* Call GET method on Poke API service to gather information about the species using its Id (retrieve during previous step)
-* Call POST method on Shakespeare Translator API to translate the species description to Shakespeare language
+* Receive a client request at /pokemon/{name} with the name being used as parameter for Poke API client calls
+* Call GET method on Poke API service to gather Pokemon information (specifically the species Id) using its name 
+* Call GET method on Poke API service to gather species description using its species Id
+* Call POST method on Shakespeare Translator API to translate the species description to a Shakespeare language version
 * Send back the successful reply to the client with a status message
 
 The classes within the project have been documented and they will not be described in detail in this document.
 
 ## Highlights
-Among the different features offered by Quarkus and used in this project
+Among the different features offered by Quarkus and used in this project:
 
 * REST client interface
 
-Easy to build client interface but difficult to customize them especially when it comes to exception handling.
+Easy to build client interfaces but difficult to customize them especially when it comes to exception handling.
+
 * Logging
 
 Easy to plug logging mechanism but difficult to configure effectively. 
+
 * Fault tolerance
 
 Only Timeout has been used, easy to put in place for Poke API and Shakespeare Translator API. 
-* Testing
-
-Easy to put in place testing with rest-assured plugin and JUnit 5, enabling to check for response status and content as well as standard unit testing for classes; mockup solution are as well available to emulate external calls.
 
 However, especially for the latter, it could be useful to use a circuit breaker, since the service is throttling incoming requests (5 requests/hour).
 This way when the threshold has been reached subsequent calls can be avoided, sparing resources and avoiding pushing the deadline in the future.
 
+* Testing
+
+Testing is easy using rest-assured plugin and JUnit 5, enabling to check for response status and content as well as standard unit testing for classes; mockup solutions are as well available to emulate external calls.
+
 ## To be improved
 Several axes to improve available: 
+
 * Observability 
 
 Plugin exists for monitoring (Micrometer, no Prometheus out of the box) and traceability; not put in place at the moment but definitely a MUST. 
@@ -88,8 +92,9 @@ With all the abstraction put in place, plus the different flavor offered, is qui
 
 No authentication or authorization put in place during this experience; plugins exist for such purpose but they have not been tested in this scope.
 
-* Native image 
-Definitely someting worth testing 
+* Native image
+
+Definitely something worth testing in the future. 
 
 ## How to run it ?
 
@@ -149,7 +154,7 @@ sudo ./mvnw package -Dquarkus.container-image.build=true
 
 The image is based on registry.access.redhat.com/ubi8/ubi-minimal:8.1 image. 
 
-If everything is correct, the docker image will show up:
+If everything is correct, the docker image will show up as following:
 ```shell script
 sudo docker images
 REPOSITORY                                    TAG                 IMAGE ID            CREATED             SIZE
